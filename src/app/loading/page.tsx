@@ -1,14 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAiCorrectorStore } from "@/stores/aiCorrectorStore";
+import { useRouter } from "next/navigation";
+import { useAiCorrectorStore, useAiCorrectorResultStore } from "@/stores/aiCorrectorStore";
 import Image from "next/image";
 
 export default function LoadingPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const { title, maxLength, textValue } = useAiCorrectorStore();
+  const { setTitle, setOriginalText, setCorrectedText } = useAiCorrectorResultStore();
+  const router = useRouter();
 
-  const steps = [
+  const [steps, setSteps] = useState([
     /**
      * loading : ai가 교정중인 상황
      * completed : ai가 확인을 마친 상황
@@ -30,17 +33,47 @@ export default function LoadingPage() {
       text: "문장의 흐름 교정",
       status: "pending"
     }
-  ];
+  ]);
 
   useEffect(() => {
     console.log(title, maxLength, textValue);
+    if (title === "" || maxLength === 0 || textValue === "") {
+        window.alert("자기소개서 작성이 완료되지 않았습니다.");
+        router.push("/selfpr");
+    }
 
-    const timer = setTimeout(() => {
-      setCurrentStep(1);
-    }, 2000);
+    const processSteps = async () => {
+        for (let i = 0; i < steps.length; i++) {
+            setSteps(prev => prev.map((step, index) => 
+                index === i 
+                  ? { ...step, status: "loading" }
+                  : step
+            ));
 
-    return () => clearTimeout(timer);
-  }, []);
+            setCurrentStep(i);
+
+            // 2초 대기
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        
+            // 완료로 변경
+            setSteps(prev => prev.map((step, index) => 
+                index === i 
+                ? { ...step, status: "completed", icon: "/success.png" }
+                : step
+            ));
+        }
+
+        // 모든 단계 완료 후 최종 결과 설정
+        setTitle(title);
+        setOriginalText(textValue);
+        setCorrectedText("교정된 텍스트 예시입니다. 실제로는 AI가 교정한 결과가 여기에 표시됩니다.");
+
+        // 모든 단계 완료 후 결과 페이지로 이동
+        router.push("/selfpr/result");
+    };
+
+    processSteps();
+  }, [textValue, title, maxLength]);
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-white text-black p-8">
