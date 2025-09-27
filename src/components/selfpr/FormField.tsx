@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAiCorrectorStore } from "@/stores/aiCorrectorStore";
 
 interface Props {
   title: string;
@@ -17,6 +18,7 @@ export default function FormField({ title, guide, maxLength, isEditable = false,
   const [isEditingTitle, setIsEditingTitle] = useState(false); // 제목 편집 모드 상태 (편집 중인지 여부)
   const [editedTitle, setEditedTitle] = useState(title); // 편집 중인 제목의 임시 값
   const [inputValue, setInputValue] = useState(maxLength.toString()); // 최대 글자 수 input의 실제 표시 값 (앞자리 0 제거를 위해 별도 관리)
+  const { setTitle, setMaxLength, setTextValue } = useAiCorrectorStore();
   const router = useRouter();
 
   const handleTitleSave = () => { // 제목 편집 완료 시 실행되는 함수
@@ -28,11 +30,9 @@ export default function FormField({ title, guide, maxLength, isEditable = false,
 
   // AI 교정 버튼 클릭 핸들러
   const handleAICorrection = () => {
-    const correctionData = {
-      maxLength: maxLength,
-      textareaValue: value,
-      editedTitle: editedTitle
-    };
+    setTitle(editedTitle);
+    setMaxLength(maxLength);
+    setTextValue(value);
     
     // loading 페이지로 이동
     router.push('/loading');

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAiCorrectorStore } from "@/stores/aiCorrectorStore";
 import Image from "next/image";
 
 export default function LoadingPage() {
   const [currentStep, setCurrentStep] = useState(0);
+  const { title, maxLength, textValue } = useAiCorrectorStore();
 
   const steps = [
     /**
@@ -31,6 +33,8 @@ export default function LoadingPage() {
   ];
 
   useEffect(() => {
+    console.log(title, maxLength, textValue);
+
     const timer = setTimeout(() => {
       setCurrentStep(1);
     }, 2000);
