@@ -6,9 +6,10 @@ import Image from "next/image";
 const pageConfig = {
     // 추후 페이지에 대한 header 정보 추가
     "/selfpr": {
-    title: "자기소개서 작성",
-    description: "각 항목별로 자신을 효과적으로 표현해보고, AI의 도움을 받아 문장을 교정해보세요"
-  }
+        title: "자기소개서 작성",
+        description: "각 항목별로 자신을 효과적으로 표현해보고, AI의 도움을 받아 문장을 교정해보세요",
+        showDescription: true
+    }
 }
 
 export default function Header() {
@@ -31,10 +32,14 @@ export default function Header() {
                 />
             </div>
             <div className="text-center">
-                <h1 className="text-2xl font-bold text-black">{page.title}</h1>
-                <p className="text-center text-gray-600 mt-2">
-                    {page.description}
-                </p>
+                {page.showDescription && (
+                    <>
+                        <h1 className="text-2xl font-bold text-black">{page.title}</h1>
+                        <p className="text-center text-gray-600 mt-2">
+                            {page.description}
+                        </p>
+                    </>
+                )}
             </div>
         </div>
     )

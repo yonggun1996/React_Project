@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Props {
   title: string;
@@ -16,12 +17,25 @@ export default function FormField({ title, guide, maxLength, isEditable = false,
   const [isEditingTitle, setIsEditingTitle] = useState(false); // 제목 편집 모드 상태 (편집 중인지 여부)
   const [editedTitle, setEditedTitle] = useState(title); // 편집 중인 제목의 임시 값
   const [inputValue, setInputValue] = useState(maxLength.toString()); // 최대 글자 수 input의 실제 표시 값 (앞자리 0 제거를 위해 별도 관리)
+  const router = useRouter();
 
   const handleTitleSave = () => { // 제목 편집 완료 시 실행되는 함수
     if (onTitleChange) {
       onTitleChange(editedTitle);
     }
     setIsEditingTitle(false);
+  };
+
+  // AI 교정 버튼 클릭 핸들러
+  const handleAICorrection = () => {
+    const correctionData = {
+      maxLength: maxLength,
+      textareaValue: value,
+      editedTitle: editedTitle
+    };
+    
+    // loading 페이지로 이동
+    router.push('/loading');
   };
 
   return (
@@ -49,7 +63,10 @@ export default function FormField({ title, guide, maxLength, isEditable = false,
           </h2>
         )}
         {/* AI 지원 버튼 */}
-        <button className="w-5 h-5 flex items-center justify-center bg-black border border-gray-600 rounded-md hover:bg-gray-900">
+        <button 
+            type="button" // 폼 제출 방지
+            onClick={handleAICorrection}
+            className="w-5 h-5 flex items-center justify-center bg-black border border-gray-600 rounded-md hover:bg-gray-900">
           <img src="/aisupport.svg" alt="AI교정버튼" className="w-4 h-4" />
         </button>
       </div>
